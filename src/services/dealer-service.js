@@ -9,7 +9,7 @@ export function getDealerFromTradeId(tradeId) {
     });
 
     if (!trade) {
-        getDefaultDealer();
+        return getDefaultDealer();
     }
 
     return getDealer(trade.dealerID);
