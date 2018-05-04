@@ -9,6 +9,9 @@
 
 <script>
 import Mapbox from 'mapbox-gl-vue';
+import pushService from './services/push-service';
+import eventBus from './services/event-bus';
+import eventConfig from './constants/event-config';
 
 const defaultOptions = {
     style: 'mapbox://styles/mapbox/streets-v9',
@@ -25,6 +28,14 @@ export default {
         return {
             mapOptions: defaultOptions
         };
+    },
+    created: function() {
+        pushService.openConnection();
+
+        // Let the bids flow baby!
+        eventBus.$on(eventConfig.newBid, bid => {
+            console.log('Received new bid!', bid);
+        });
     },
     methods: {
         mapClicked(map) {
