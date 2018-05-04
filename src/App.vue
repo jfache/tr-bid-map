@@ -3,21 +3,29 @@
     <mapbox
         access-token="pk.eyJ1IjoibHV1a3ZhbmJhYXJzIiwiYSI6ImNqZ3Jia3pyMjAwa3Myd2xlczhzYWk3NWsifQ.VNQ_VAyPIF2BaZEo4lztFw"
         :map-options="mapOptions"
-        @map-click="mapClicked"></mapbox>
+        @map-load="mapLoaded"></mapbox>
+    <div class="actions">
+        <a @click="centerTo('ontario')">Ontario</a>
+        <a @click="centerTo('sf')">SF</a>
+    </div>
   </div>
 </template>
 
 <script>
 import Mapbox from 'mapbox-gl-vue';
+import dealers from './data/dealers.json';
 import pushService from './services/push-service';
 import eventBus from './services/event-bus';
 import eventConfig from './constants/event-config';
 
 const defaultOptions = {
-    style: 'mapbox://styles/mapbox/streets-v9',
+    style: 'mapbox://styles/luukvanbaars/cjgs2n25s000c2spelxhyopsb',
     center: [-79.383184, 43.653226],
-    zoom: 15
+    zoom: 10
 };
+
+// Populated on map load
+let _map;
 
 export default {
     name: 'app',
@@ -38,59 +46,49 @@ export default {
         });
     },
     methods: {
-        mapClicked(map) {
+        placeDealers(map) {
+            let features = [];
+
+            dealers.forEach(function(dealer) {
+                features.push({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [dealer.longitude, dealer.latitude]
+                    },
+                    properties: {
+                        title: dealer.name,
+                        icon: 'harbor'
+                    }
+                });
+            });
+
             map.addLayer({
-                id: 'points',
+                id: 'dealers',
                 type: 'symbol',
                 source: {
                     type: 'geojson',
                     data: {
                         type: 'FeatureCollection',
-                        features: [
-                            {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: [-77.03238901390978, 38.913188059745586]
-                                },
-                                properties: {
-                                    title: 'Mapbox DC',
-                                    icon: 'monument'
-                                }
-                            },
-                            {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: [-122.414, 37.776]
-                                },
-                                properties: {
-                                    title: 'Mapbox SF',
-                                    icon: 'harbor'
-                                }
-                            },
-                            {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: defaultOptions.center
-                                },
-                                properties: {
-                                    title: 'Test Toronto',
-                                    icon: 'account'
-                                }
-                            }
-                        ]
+                        features: features
                     }
                 },
                 layout: {
-                    'icon-image': '{icon}-15',
-                    'text-field': '{title}',
-                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                    'text-offset': [0, 0.6],
-                    'text-anchor': 'top'
+                    'icon-image': '{icon}-15'
                 }
             });
+        },
+        centerTo(location) {
+            console.log(location);
+            let center;
+            let zoom = 10;
+            switch (location) {
+                case 'ontario':
+            }
+        },
+        mapLoaded(map) {
+            _map = map;
+            this.placeDealers(map);
         }
     }
 };
