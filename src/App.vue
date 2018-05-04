@@ -23,9 +23,9 @@ import eventConfig from './constants/event-config';
 import { findWhere } from 'underscore';
 
 const defaultOptions = {
-    style: 'mapbox://styles/luukvanbaars/cjgs2n25s000c2spelxhyopsb',
-    center: [-79.383184, 43.653226],
-    zoom: 10
+    style: 'mapbox://styles/luukvanbaars/cjgsa6mk6000w2rnkmnn1em4t',
+    center: [-96.898047, 43.999263],
+    zoom: 3
 };
 
 // Populated on map load
@@ -62,7 +62,7 @@ export default {
             });
 
             if (!activity) {
-                this.activities.unshift({
+                this.activities.push({
                     key: `${tradeId}-${maxBidAmount}-${topBidderId}`,
                     maxBidAmount,
                     topBidderId,
@@ -72,7 +72,6 @@ export default {
         },
         placeDealers(map) {
             let features = [];
-
             dealers.forEach(function(dealer) {
                 features.push({
                     type: 'Feature',
@@ -82,14 +81,14 @@ export default {
                     },
                     properties: {
                         title: dealer.name,
+                        bids: Math.random() * (10 - 1) + 1,
                         icon: 'harbor'
                     }
                 });
             });
-
             map.addLayer({
                 id: 'dealers',
-                type: 'symbol',
+                type: 'circle',
                 source: {
                     type: 'geojson',
                     data: {
@@ -97,8 +96,11 @@ export default {
                         features: features
                     }
                 },
-                layout: {
-                    'icon-image': '{icon}-15'
+                paint: {
+                    'circle-color': '#333',
+                    'circle-radius': {
+                        stops: [[12, 5], [22, 10]]
+                    }
                 }
             });
         },
