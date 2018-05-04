@@ -22,9 +22,6 @@ export default {
     props: ['activities'],
     data: function() {
         return {};
-    },
-    created: function() {
-        console.log('Activity Feed created!');
     }
 };
 </script>

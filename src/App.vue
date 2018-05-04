@@ -46,11 +46,52 @@ export default {
 
         // Let the bids flow baby!
         eventBus.$on(eventConfig.newBid, function(bid) {
-            console.log('Received new bid!', bid);
             vm.updateActivityFeed(bid);
+            vm.animateDots(bid);
         });
     },
     methods: {
+        animateDots({ maxBidAmount, topBidder, tradeId }) {
+            let key = `${tradeId}-${maxBidAmount}-${topBidder.id}`;
+            let seller = dealerService.getDealerFromTradeId(tradeId);
+            let buyer = dealerService.getDealer(topBidder.companyId);
+
+            _map.addLayer({
+                id: `bid-${key}`,
+                type: 'circle',
+                source: {
+                    type: 'geojson',
+                    data: {
+                        type: 'FeatureCollection',
+                        features: [
+                            {
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'Point',
+                                    coordinates: [
+                                        seller.longitude,
+                                        seller.latitude
+                                    ]
+                                }
+                            },
+                            {
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'Point',
+                                    coordinates: [
+                                        buyer.longitude,
+                                        buyer.latitude
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                paint: {
+                    'circle-color': '#FFF'
+                }
+            });
+        },
         updateActivityFeed({ maxBidAmount, topBidder, tradeId }) {
             let key = `${tradeId}-${maxBidAmount}-${topBidder.id}`;
             let activity = findWhere(this.activities, {

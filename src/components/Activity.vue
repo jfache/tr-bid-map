@@ -19,9 +19,6 @@ export default {
     props: ['buyer', 'seller', 'bidAmount'],
     data: function() {
         return {};
-    },
-    created: function() {
-        console.log('Activity created!');
     }
 };
 </script>
