@@ -1,6 +1,7 @@
 <template>
     <div id="app">
         <activity-feed :activities="activities" />
+        <daily-stats :stats="stats" />
         <mapbox
             access-token="pk.eyJ1IjoibHV1a3ZhbmJhYXJzIiwiYSI6ImNqZ3Jia3pyMjAwa3Myd2xlczhzYWk3NWsifQ.VNQ_VAyPIF2BaZEo4lztFw"
             :map-options="mapOptions"
@@ -12,6 +13,7 @@
 <script>
 import Mapbox from 'mapbox-gl-vue';
 import ActivityFeed from './components/ActivityFeed';
+import DailyStats from './components/DailyStats';
 import dealers from './data/dealers.json';
 import dealerService from './services/dealer-service';
 import pushService from './services/push-service';
@@ -32,12 +34,17 @@ export default {
     name: 'app',
     components: {
         Mapbox,
-        ActivityFeed
+        ActivityFeed,
+        DailyStats
     },
     data: function() {
         return {
             mapOptions: defaultOptions,
-            activities: []
+            activities: [],
+            stats: {
+                highestBidAmount: 0,
+                totalNumBids: 0
+            }
         };
     },
     created: function() {
@@ -68,20 +75,14 @@ export default {
                                 type: 'Feature',
                                 geometry: {
                                     type: 'Point',
-                                    coordinates: [
-                                        seller.longitude,
-                                        seller.latitude
-                                    ]
+                                    coordinates: [seller.longitude, seller.latitude]
                                 }
                             },
                             {
                                 type: 'Feature',
                                 geometry: {
                                     type: 'Point',
-                                    coordinates: [
-                                        buyer.longitude,
-                                        buyer.latitude
-                                    ]
+                                    coordinates: [buyer.longitude, buyer.latitude]
                                 }
                             }
                         ]
@@ -95,7 +96,13 @@ export default {
                 }
             });
         },
-        updateActivityFeed({ maxBidAmount, topBidder, tradeId }) {
+        updateDailyStats({ maxBidAmount }) {
+            if (maxBidAmount > this.stats.highestBidAmount) {
+                this.stats.highestBidAmount = maxBidAmount;
+            }
+            this.stats.totalNumBids++;
+        },
+        updateActivityFeed({ maxBidAmount, topBidder, tradeId, ...rest }) {
             let key = `${tradeId}-${maxBidAmount}-${topBidder.id}`;
             let activity = findWhere(this.activities, {
                 key: key
@@ -105,6 +112,9 @@ export default {
             if (activity) {
                 return;
             }
+
+            // If this is a valid bid, update daily stats
+            this.updateDailyStats({ maxBidAmount, ...rest });
 
             let seller = dealerService.getDealerFromTradeId(tradeId);
             let buyer = dealerService.getDealer(topBidder.companyId);

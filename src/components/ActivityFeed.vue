@@ -30,7 +30,6 @@ export default {
 <style>
 .activity-feed {
     z-index: 10000;
-    z-index: 10000;
     position: fixed;
     top: 80px;
     left: 80px;
