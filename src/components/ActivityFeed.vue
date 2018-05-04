@@ -34,7 +34,8 @@ export default {
     top: 80px;
     left: 80px;
     height: calc(100% - 240px);
-    width: 40vh;
+    width: 40vw;
+    max-width: 380px;
     padding: 40px;
     background: #fff;
     box-shadow: 0px 15px 30px 0 rgba(0, 0, 0, 0.25);
