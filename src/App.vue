@@ -4,6 +4,7 @@
         access-token="pk.eyJ1IjoibHV1a3ZhbmJhYXJzIiwiYSI6ImNqZ3Jia3pyMjAwa3Myd2xlczhzYWk3NWsifQ.VNQ_VAyPIF2BaZEo4lztFw"
         :map-options="mapOptions"
         @map-load="mapLoaded"></mapbox>
+    <div class="overlay"></div>
     <div class="actions">
         <a @click="centerTo('ontario')">Ontario</a>
         <a @click="centerTo('sf')">SF</a>
@@ -19,9 +20,9 @@ import eventBus from './services/event-bus';
 import eventConfig from './constants/event-config';
 
 const defaultOptions = {
-    style: 'mapbox://styles/luukvanbaars/cjgs2n25s000c2spelxhyopsb',
-    center: [-79.383184, 43.653226],
-    zoom: 10
+    style: 'mapbox://styles/luukvanbaars/cjgsa6mk6000w2rnkmnn1em4t',
+    center: [-96.898047, 43.999263],
+    zoom: 3
 };
 
 // Populated on map load
@@ -75,11 +76,9 @@ export default {
                     }
                 },
                 paint: {
-                    'circle-color': '#000000',
+                    'circle-color': '#333',
                     'circle-radius': {
-                        property: 'bids',
-                        type: 'exponential',
-                        stops: [[1, 2], [10, 10]]
+                        stops: [[12, 5], [22, 10]]
                     }
                 }
             });
@@ -114,5 +113,16 @@ body {
 #map {
     width: 100%;
     height: 90vh;
+}
+
+.overlay {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 90vh;
+    background: url('./assets/gradient-overlay.png');
+    background-size: cover;
 }
 </style>
