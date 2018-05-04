@@ -33,16 +33,16 @@ export default {
 <style>
 .activity-feed {
     z-index: 10000;
+    z-index: 10000;
     position: fixed;
-    top: 0;
-    left: 5%;
-    height: 80vh;
-    width: 35vh;
-    margin-top: 5vh;
+    top: 80px;
+    left: 80px;
+    height: calc(100% - 240px);
+    width: 40vh;
     padding: 40px;
     background: #fff;
     box-shadow: 0px 15px 30px 0 rgba(0, 0, 0, 0.25);
-    border-radius: 20px;
+    border-radius: 5px;
     overflow: hidden;
 }
 
@@ -51,7 +51,7 @@ export default {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 30vh;
+    height: 20vh;
     background: -moz-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%); /* FF3.6-15 */
     background: -webkit-linear-gradient(
         top,
@@ -72,7 +72,7 @@ export default {
     font-size: 24px;
     font-weight: bold;
     text-transform: uppercase;
-    border-bottom: 2px solid #000;
+    border-bottom: 1px solid #707070;
 }
 
 .activity-feed__list {
