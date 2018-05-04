@@ -88,7 +88,10 @@ export default {
                     }
                 },
                 paint: {
-                    'circle-color': '#FFF'
+                    'circle-color': '#FFF',
+                    'circle-radius': {
+                        stops: [[5, 1.75], [6, 3]]
+                    }
                 }
             });
         },
