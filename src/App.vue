@@ -21,8 +21,8 @@ import { findWhere } from 'underscore';
 
 const defaultOptions = {
     style: 'mapbox://styles/luukvanbaars/cjgsa6mk6000w2rnkmnn1em4t',
-    center: [-96.898047, 43.999263],
-    zoom: 3
+    center: [-112.898047, 42.999263],
+    zoom: 3.5
 };
 
 // Populated on map load
