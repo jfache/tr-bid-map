@@ -99,7 +99,7 @@ export default {
                 paint: {
                     'circle-color': '#333',
                     'circle-radius': {
-                        stops: [[12, 5], [22, 10]]
+                        stops: [[5, 1.75], [6, 3]]
                     }
                 }
             });
