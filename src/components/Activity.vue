@@ -1,5 +1,5 @@
 <template>
-    <div class="activity">
+    <div class="activity animated bounceInRight">
         <div class="activity__line"></div>
         <div class="activity__company">
             {{topBidderId}}

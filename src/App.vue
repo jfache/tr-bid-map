@@ -62,7 +62,7 @@ export default {
             });
 
             if (!activity) {
-                this.activities.push({
+                this.activities.unshift({
                     key: `${tradeId}-${maxBidAmount}-${topBidderId}`,
                     maxBidAmount,
                     topBidderId,
