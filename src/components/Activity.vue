@@ -5,7 +5,7 @@
             {{buyer.name}}
         </div>
         <div class="activity__bid">
-            {{bidAmount}}
+            {{bidAmount | currency}}
         </div>
         <div class="activity__company">
             {{seller.name}}
@@ -32,7 +32,8 @@ export default {
     margin: 10px 0;
     background: rgba(0, 0, 0, 0.05);
     text-align: center;
-    font-size: 14px;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.8);
     border-radius: 5px;
 }
 
@@ -46,7 +47,7 @@ export default {
 }
 
 .activity__company {
-    padding: 5px;
+    padding: 8px;
 }
 
 .activity__bid {

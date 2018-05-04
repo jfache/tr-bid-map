@@ -67,7 +67,7 @@ export default {
             let bidAmount = maxBidAmount;
 
             this.activities.unshift({
-                key: `${tradeId}-${maxBidAmount}-${topBidder.id}`,
+                key,
                 seller,
                 buyer,
                 bidAmount

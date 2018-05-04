@@ -28,7 +28,7 @@ export function getDealer(dealerId) {
     return dealer;
 }
 
-export function getDefaultDealer() {
+function getDefaultDealer() {
     return {
         name: 'Unknown'
     };
