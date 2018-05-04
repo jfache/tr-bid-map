@@ -7,7 +7,6 @@
     <div class="actions">
         <a @click="centerTo('ontario')">Ontario</a>
         <a @click="centerTo('sf')">SF</a>
-        <a @click="placeDealers">Place dealers</a>
     </div>
   </div>
 </template>
@@ -19,7 +18,7 @@ import dealers from "./data/dealers.json";
 const defaultOptions = {
     style: "mapbox://styles/luukvanbaars/cjgs2n25s000c2spelxhyopsb",
     center: [-79.383184, 43.653226],
-    zoom: 15
+    zoom: 10
 };
 
 // Populated on map load
@@ -36,10 +35,7 @@ export default {
         };
     },
     methods: {
-        placeDealers() {
-            console.log("yyy");
-            console.log(_map);
-
+        placeDealers(map) {
             let features = [];
 
             dealers.forEach(function(dealer) {
@@ -56,7 +52,7 @@ export default {
                 });
             });
 
-            _map.addLayer({
+            map.addLayer({
                 id: "dealers",
                 type: "symbol",
                 source: {
@@ -81,6 +77,7 @@ export default {
         },
         mapLoaded(map) {
             _map = map;
+            this.placeDealers(map);
         }
     }
 };
