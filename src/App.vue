@@ -58,6 +58,7 @@ export default {
                     },
                     properties: {
                         title: dealer.name,
+                        bids: Math.random() * (10 - 1) + 1,
                         icon: 'harbor'
                     }
                 });
@@ -65,7 +66,7 @@ export default {
 
             map.addLayer({
                 id: 'dealers',
-                type: 'symbol',
+                type: 'circle',
                 source: {
                     type: 'geojson',
                     data: {
@@ -73,8 +74,13 @@ export default {
                         features: features
                     }
                 },
-                layout: {
-                    'icon-image': '{icon}-15'
+                paint: {
+                    'circle-color': '#000000',
+                    'circle-radius': {
+                        property: 'bids',
+                        type: 'exponential',
+                        stops: [[1, 2], [10, 10]]
+                    }
                 }
             });
         },
