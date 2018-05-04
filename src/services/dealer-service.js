@@ -2,9 +2,9 @@ import dealers from '../data/dealers.json';
 import trades from '../data/trades.json';
 import { findWhere } from 'underscore';
 
-export function getDealerFromTradeId(tradeId) {
+export function getDealerFromTradeId(tradeId, region = 'CA') {
     let trade = findWhere(trades, {
-        region: 'CA',
+        region: region,
         tradeID: tradeId
     });
 
@@ -15,9 +15,9 @@ export function getDealerFromTradeId(tradeId) {
     return getDealer(trade.dealerID);
 }
 
-export function getDealer(dealerId) {
+export function getDealer(dealerId, region = 'CA') {
     let dealer = findWhere(dealers, {
-        region: 'CA',
+        region: region,
         id: dealerId
     });
 
