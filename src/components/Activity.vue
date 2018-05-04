@@ -1,14 +1,14 @@
 <template>
-    <div class="activity animated bounceInRight">
+    <div class="activity animated fadeInLeft">
         <div class="activity__line"></div>
         <div class="activity__company">
-            {{topBidderId}}
+            {{buyer.name}}
         </div>
         <div class="activity__bid">
-            {{maxBidAmount}}
+            {{bidAmount}}
         </div>
         <div class="activity__company">
-            {{topBidderId}}
+            {{seller.name}}
         </div>
     </div>
 </template>
@@ -16,7 +16,7 @@
 <script>
 export default {
     name: 'Activity',
-    props: ['topBidderId', 'maxBidAmount', 'tradeId'],
+    props: ['buyer', 'seller', 'bidAmount'],
     data: function() {
         return {};
     },

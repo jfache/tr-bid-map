@@ -6,10 +6,6 @@
             :map-options="mapOptions"
             @map-load="mapLoaded">
         </mapbox>
-        <div class="actions">
-            <a @click="centerTo('ontario')">Ontario</a>
-            <a @click="centerTo('sf')">SF</a>
-        </div>
     </div>
 </template>
 
@@ -17,6 +13,7 @@
 import Mapbox from 'mapbox-gl-vue';
 import ActivityFeed from './components/ActivityFeed';
 import dealers from './data/dealers.json';
+import dealerService from './services/dealer-service';
 import pushService from './services/push-service';
 import eventBus from './services/event-bus';
 import eventConfig from './constants/event-config';
@@ -54,21 +51,27 @@ export default {
         });
     },
     methods: {
-        updateActivityFeed({ maxBidAmount, topBidderId, tradeId }) {
-            // Check if we have this key
-            let key = `${tradeId}-${maxBidAmount}-${topBidderId}`;
+        updateActivityFeed({ maxBidAmount, topBidder, tradeId }) {
+            let key = `${tradeId}-${maxBidAmount}-${topBidder.id}`;
             let activity = findWhere(this.activities, {
                 key: key
             });
 
-            if (!activity) {
-                this.activities.unshift({
-                    key: `${tradeId}-${maxBidAmount}-${topBidderId}`,
-                    maxBidAmount,
-                    topBidderId,
-                    tradeId
-                });
+            // If we already have this activity in the feed, ignore it
+            if (activity) {
+                return;
             }
+
+            let seller = dealerService.getDealerFromTradeId(tradeId);
+            let buyer = dealerService.getDealer(topBidder.companyId);
+            let bidAmount = maxBidAmount;
+
+            this.activities.unshift({
+                key: `${tradeId}-${maxBidAmount}-${topBidder.id}`,
+                seller,
+                buyer,
+                bidAmount
+            });
         },
         placeDealers(map) {
             let features = [];
@@ -149,6 +152,6 @@ body {
 
 #map {
     width: 100%;
-    height: 90vh;
+    height: 100vh;
 }
 </style>
