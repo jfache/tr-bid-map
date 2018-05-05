@@ -7,6 +7,10 @@
             :map-options="mapOptions"
             @map-load="mapLoaded">
         </mapbox>
+        <div id="debug">
+            <div @click="panMap">Pan Map</div>
+            <div @click="getMapInfo">Map Info</div>
+        </div>
     </div>
 </template>
 
@@ -19,13 +23,18 @@ import dealerService from './services/dealer-service';
 import pushService from './services/push-service';
 import eventBus from './services/event-bus';
 import eventConfig from './constants/event-config';
+import areas from './constants/areas';
 import { findWhere } from 'underscore';
 import turf from 'turf';
 
 const defaultOptions = {
     style: 'mapbox://styles/luukvanbaars/cjgsa6mk6000w2rnkmnn1em4t',
-    center: [-112.898047, 42.999263],
-    zoom: 3.5
+    center: areas[0].center,
+    zoom: areas[0].zoom
+};
+
+const defaultCircleRadius = {
+    stops: [[5, 1.75], [6, 3]]
 };
 
 // Populated on map load
@@ -46,7 +55,8 @@ export default {
                 highestBidAmount: 0,
                 totalNumBids: 0
             },
-            bids: []
+            bids: [],
+            areaIndex: 0
         };
     },
     created: function() {
@@ -183,7 +193,7 @@ export default {
                 type: 'circle',
                 paint: {
                     'circle-color': '#FFF',
-                    'circle-radius': 1.75
+                    'circle-radius': defaultCircleRadius
                 }
             });
 
@@ -307,23 +317,33 @@ export default {
                 },
                 paint: {
                     'circle-color': '#333',
-                    'circle-radius': {
-                        stops: [[5, 1.75], [6, 3]]
-                    }
+                    'circle-radius': defaultCircleRadius
                 }
             });
-        },
-        centerTo(location) {
-            console.log(location);
-            let center;
-            let zoom = 10;
-            switch (location) {
-                case 'ontario':
-            }
         },
         mapLoaded(map) {
             _map = map;
             this.placeDealers(map);
+            setTimeout(this.panMap, areas[this.areaIndex].duration);
+        },
+        panMap() {
+            this.areaIndex++;
+            if (this.areaIndex >= areas.length) {
+                this.areaIndex = 0;
+            }
+            var nextArea = areas[this.areaIndex];
+
+            _map.flyTo({
+                center: nextArea.center,
+                zoom: nextArea.zoom,
+                speed: 0.5
+            });
+
+            setTimeout(this.panMap, nextArea.duration);
+        },
+        getMapInfo() {
+            console.log(_map.getCenter());
+            console.log(_map.getZoom());
         }
     }
 };
@@ -359,5 +379,12 @@ body {
 #map {
     width: 100%;
     height: 100vh;
+}
+
+#debug {
+    display: none;
+    position: absolute;
+    top: 20px;
+    left: 20px;
 }
 </style>
