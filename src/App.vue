@@ -1,7 +1,6 @@
 <template>
-
     <div id="app">
-    	<div id="overlay"></div>
+        <div id="overlay"></div>
         <activity-feed :activities="activities" />
         <daily-stats :stats="stats" />
         <mapbox
@@ -13,7 +12,6 @@
             <div @click="panMap">Pan Map</div>
             <div @click="getMapInfo">Map Info</div>
         </div>
-        
     </div>
 </template>
 
@@ -157,6 +155,9 @@ export default {
                 arc.push(segment.geometry.coordinates);
             }
 
+            // Make sure to always have the destination included
+            arc.push(destination);
+
             // Update the route with calculated arc coordinates
             route.features[0].geometry.coordinates = arc;
 
@@ -223,8 +224,6 @@ export default {
                 if (counter < steps) {
                     requestAnimationFrame(animate);
                 } else {
-                    // Set correct destination
-                    // _map.removeLayer(`point-${key}`);
                     setTimeout(cleanup, 3000);
                 }
 
@@ -379,9 +378,9 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-#overlay{
-	background-image: url('assets/gradient-overlay.png');
-	position: absolute;
+#overlay {
+    background-image: url('assets/gradient-overlay.png');
+    position: absolute;
     height: 100%;
     width: 100%;
     z-index: 1;
@@ -390,7 +389,6 @@ body {
 #map {
     width: 100%;
     height: 100vh;
-
 }
 
 #debug {
