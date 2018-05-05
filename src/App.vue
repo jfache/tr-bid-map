@@ -20,6 +20,7 @@ import pushService from './services/push-service';
 import eventBus from './services/event-bus';
 import eventConfig from './constants/event-config';
 import { findWhere } from 'underscore';
+import turf from 'turf';
 
 const defaultOptions = {
     style: 'mapbox://styles/luukvanbaars/cjgsa6mk6000w2rnkmnn1em4t',
@@ -44,12 +45,13 @@ export default {
             stats: {
                 highestBidAmount: 0,
                 totalNumBids: 0
-            }
+            },
+            bids: []
         };
     },
     created: function() {
         var vm = this;
-        pushService.openConnection();
+        // pushService.openConnection();
 
         // Let the bids flow baby!
         eventBus.$on(eventConfig.newBid, function(bid) {
@@ -58,43 +60,185 @@ export default {
         });
     },
     methods: {
-        animateDots({ maxBidAmount, topBidder, tradeId }) {
-            let key = `${tradeId}-${maxBidAmount}-${topBidder.id}`;
-            let seller = dealerService.getDealerFromTradeId(tradeId);
-            let buyer = dealerService.getDealer(topBidder.companyId);
+        animateDots({ maxBidAmount, topBidder, tradeId, tradeRegion }) {
+            let key = `${tradeId}-${maxBidAmount}-${topBidder.companyId}`;
+
+            if (this.bids.includes(key)) {
+                return;
+            }
+
+            this.bids.push(key);
+
+            let seller = dealerService.getDealerFromTradeId(
+                tradeId,
+                tradeRegion
+            );
+            let buyer = dealerService.getDealer(
+                topBidder.companyId,
+                topBidder.region
+            );
+
+            if (!buyer.longitude || !seller.longitude) {
+                return;
+            }
+
+            var origin = [buyer.longitude, buyer.latitude];
+            var destination = [seller.longitude, seller.latitude];
+
+            var point = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'Point',
+                            coordinates: origin
+                        }
+                    }
+                ]
+            };
+
+            var originPoint = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: origin
+                        }
+                    }
+                ]
+            };
+
+            var route = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: [origin, destination]
+                        }
+                    }
+                ]
+            };
+
+            // Calculate the distance in kilometers between route start/end point.
+            var lineDistance = turf.lineDistance(
+                route.features[0],
+                'kilometers'
+            );
+
+            var arc = [];
+
+            // Number of steps to use in the arc and animation, more steps means
+            // a smoother arc and animation, but too many steps will result in a
+            // low frame rate
+            var steps = Math.min(Math.floor(lineDistance / 20), 70);
+
+            // Draw an arc between the `origin` & `destination` of the two points
+            for (var i = 0; i < lineDistance; i += lineDistance / steps) {
+                var segment = turf.along(route.features[0], i, 'kilometers');
+                arc.push(segment.geometry.coordinates);
+            }
+
+            // Update the route with calculated arc coordinates
+            route.features[0].geometry.coordinates = arc;
+
+            // Used to increment the value of the point measurement against the route.
+            var counter = 0;
+
+            // Add a source and layer displaying a point which will be animated in a circle.
+            _map.addSource(`route-${key}`, {
+                type: 'geojson',
+                data: route
+            });
+
+            _map.addSource(`origin-point-${key}`, {
+                type: 'geojson',
+                data: originPoint
+            });
+
+            _map.addSource(`point-${key}`, {
+                type: 'geojson',
+                data: point
+            });
 
             _map.addLayer({
-                id: `bid-${key}`,
-                type: 'circle',
-                source: {
-                    type: 'geojson',
-                    data: {
-                        type: 'FeatureCollection',
-                        features: [
-                            {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: [seller.longitude, seller.latitude]
-                                }
-                            },
-                            {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: [buyer.longitude, buyer.latitude]
-                                }
-                            }
-                        ]
-                    }
-                },
+                id: `route-${key}`,
+                source: `route-${key}`,
+                type: 'line',
                 paint: {
-                    'circle-color': '#FFF',
-                    'circle-radius': {
-                        stops: [[5, 1.75], [6, 3]]
-                    }
+                    'line-width': 1,
+                    'line-color': '#FFF',
+                    'line-opacity': 0.4
                 }
             });
+
+            _map.addLayer({
+                id: `origin-point-${key}`,
+                source: `origin-point-${key}`,
+                type: 'circle',
+                paint: {
+                    'circle-color': '#FFF',
+                    'circle-radius': 1.75
+                }
+            });
+
+            _map.addLayer({
+                id: `point-${key}`,
+                source: `point-${key}`,
+                type: 'circle',
+                paint: {
+                    'circle-color': '#FFF',
+                    'circle-radius': 2
+                }
+            });
+
+            function animate() {
+                // Update point geometry to a new position based on counter denoting
+                // the index to access the arc.
+                point.features[0].geometry.coordinates =
+                    route.features[0].geometry.coordinates[counter];
+
+                // Update the source with this new data.
+                _map.getSource(`point-${key}`).setData(point);
+
+                // Request the next frame of animation so long the end has not been reached.
+                if (counter < steps) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Set correct destination
+                    // _map.removeLayer(`point-${key}`);
+                    setTimeout(cleanup, 1500);
+                }
+
+                counter = counter + 1;
+            }
+
+            // Start the animation.
+            animate(counter);
+
+            function cleanup() {
+                [`origin-point-${key}`, `point-${key}`].forEach(layer => {
+                    _map.setPaintProperty(layer, 'circle-opacity', 0);
+                });
+                [`route-${key}`].forEach(layer => {
+                    _map.setPaintProperty(layer, 'line-opacity', 0);
+                });
+
+                setTimeout(removeLayers, 500);
+            }
+
+            function removeLayers() {
+                [`origin-point-${key}`, `point-${key}`, `route-${key}`].forEach(
+                    layer => {
+                        _map.removeLayer(layer);
+                    }
+                );
+            }
         },
         updateDailyStats({ maxBidAmount }) {
             if (maxBidAmount > this.stats.highestBidAmount) {
@@ -102,7 +246,13 @@ export default {
             }
             this.stats.totalNumBids++;
         },
-        updateActivityFeed({ maxBidAmount, topBidder, tradeId, ...rest }) {
+        updateActivityFeed({
+            maxBidAmount,
+            topBidder,
+            tradeId,
+            tradeRegion,
+            ...rest
+        }) {
             let key = `${tradeId}-${maxBidAmount}-${topBidder.id}`;
             let activity = findWhere(this.activities, {
                 key: key
@@ -116,8 +266,14 @@ export default {
             // If this is a valid bid, update daily stats
             this.updateDailyStats({ maxBidAmount, ...rest });
 
-            let seller = dealerService.getDealerFromTradeId(tradeId);
-            let buyer = dealerService.getDealer(topBidder.companyId);
+            let seller = dealerService.getDealerFromTradeId(
+                tradeId,
+                tradeRegion
+            );
+            let buyer = dealerService.getDealer(
+                topBidder.companyId,
+                topBidder.region
+            );
             let bidAmount = maxBidAmount;
 
             this.activities.unshift({
@@ -136,11 +292,7 @@ export default {
                         type: 'Point',
                         coordinates: [dealer.longitude, dealer.latitude]
                     },
-                    properties: {
-                        title: dealer.name,
-                        bids: Math.random() * (10 - 1) + 1,
-                        icon: 'harbor'
-                    }
+                    properties: {}
                 });
             });
             map.addLayer({

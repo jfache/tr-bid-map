@@ -1,6 +1,6 @@
 <template>
     <div class="activity-feed">
-        <div class="activity-feed__title">
+        <div class="activity-feed__title" @click="bid">
             Activity Feed
         </div>
         <div class="activity-feed__list">
@@ -14,6 +14,16 @@
 
 <script>
 import Activity from './Activity';
+import eventBus from '../services/event-bus';
+import eventConfig from '../constants/event-config';
+import dealers from '../data/dealers.json';
+import trades from '../data/trades.json';
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
 
 export default {
     name: 'ActivityFeed',
@@ -23,6 +33,22 @@ export default {
     props: ['activities'],
     data: function() {
         return {};
+    },
+    methods: {
+        bid() {
+            let randomTrade = trades[getRandomInt(0, trades.length - 1)];
+            let randomBidder = dealers[getRandomInt(0, dealers.length - 1)];
+            let message = {
+                maxBidAmount: getRandomInt(50, 15000),
+                tradeId: randomTrade.tradeID,
+                tradeRegion: randomTrade.region,
+                topBidder: {
+                    companyId: randomBidder.id,
+                    region: randomBidder.region
+                }
+            };
+            eventBus.$emit(eventConfig.newBid, message);
+        }
     }
 };
 </script>
@@ -49,7 +75,11 @@ export default {
     left: 0;
     width: 100%;
     height: 20vh;
-    background: -moz-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%); /* FF3.6-15 */
+    background: -moz-linear-gradient(
+        top,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 1) 100%
+    ); /* FF3.6-15 */
     background: -webkit-linear-gradient(
         top,
         rgba(255, 255, 255, 0) 0%,
