@@ -1,5 +1,7 @@
 <template>
+
     <div id="app">
+    	<div id="overlay"></div>
         <activity-feed :activities="activities" />
         <daily-stats :stats="stats" />
         <mapbox
@@ -11,6 +13,7 @@
             <div @click="panMap">Pan Map</div>
             <div @click="getMapInfo">Map Info</div>
         </div>
+        
     </div>
 </template>
 
@@ -181,9 +184,9 @@ export default {
                 source: `route-${key}`,
                 type: 'line',
                 paint: {
-                    'line-width': 1,
+                    'line-width': 2,
                     'line-color': '#FFF',
-                    'line-opacity': 0.4
+                    'line-opacity': 0.75
                 }
             });
 
@@ -222,7 +225,7 @@ export default {
                 } else {
                     // Set correct destination
                     // _map.removeLayer(`point-${key}`);
-                    setTimeout(cleanup, 1500);
+                    setTimeout(cleanup, 3000);
                 }
 
                 counter = counter + 1;
@@ -376,9 +379,18 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+#overlay{
+	background-image: url('assets/gradient-overlay.png');
+	position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
+
 #map {
     width: 100%;
     height: 100vh;
+
 }
 
 #debug {
