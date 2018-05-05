@@ -1,0 +1,193 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"version": "1.0.0",
+		"title": "Swagger Petstore",
+		"license": {
+			"name": "MIT"
+		}
+	},
+	"host": "petstore.swagger.io",
+	"basePath": "/api",
+	"schemes": [
+		"http"
+	],
+	"consumes": [
+		"application/json"
+	],
+	"produces": [
+		"application/json"
+	],
+	"paths": {
+		"/dealer/list": {
+			"post": {
+				"summary": "Get all the dealers",
+				"operationId": "getDealers",
+				"tags": [
+					"dealers"
+				],
+				"responses": {
+					"200": {
+						"description": "Expected response to a valid request",
+						"schema": {
+							"$ref": "#/definitions/Dealers"
+						}
+					},
+					"default": {
+						"description": "unexpected error",
+						"schema": {
+							"$ref": "#/definitions/Error"
+						}
+					}
+				}
+			}
+		},
+		"/trade/list": {
+			"post": {
+				"summary": "Get all the trades",
+				"operationId": "getTrades",
+				"tags": [
+					"trades"
+				],
+				"responses": {
+					"200": {
+						"description": "Expected response to a valid request",
+						"schema": {
+							"$ref": "#/definitions/Trades"
+						}
+					},
+					"default": {
+						"description": "unexpected error",
+						"schema": {
+							"$ref": "#/definitions/Error"
+						}
+					}
+				}
+			}
+		},
+		"/trade/stat": {
+			"post": {
+				"summary": "Get all the stats about trades",
+				"operationId": "getTradesStats",
+				"tags": [
+					"trades"
+				],
+				"responses": {
+					"200": {
+						"description": "Expected response to a valid request",
+						"schema": {
+							"$ref": "#/definitions/Stats"
+						}
+					},
+					"default": {
+						"description": "unexpected error",
+						"schema": {
+							"$ref": "#/definitions/Error"
+						}
+					}
+				}
+			}
+		},
+		"/trade/{id}": {
+			"post": {
+				"summary": "Get stats about trades",
+				"operationId": "getTradeID",
+				"tags": [
+					"tradeID"
+				],
+				"responses": {
+					"200": {
+						"description": "Expected response to a valid request",
+						"schema": {
+							"$ref": "#/definitions/Trade"
+						}
+					},
+					"default": {
+						"description": "unexpected error",
+						"schema": {
+							"$ref": "#/definitions/Error"
+						}
+					}
+				}
+			}
+		}
+	},
+	"definitions": {
+		"Dealer": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"lat": {
+					"type": "number"
+				},
+				"long": {
+					"type": "number"
+				}
+			}
+		},
+		"Dealers": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/Dealer"
+			}
+		},
+		"Trade": {
+			"properties": {
+				"tradeID": {
+					"type": "number"
+				},
+				"dealerID": {
+					"type": "number"
+				}
+			}
+		},
+		"Trades": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/Trade"
+			}
+		},
+		"Stat": {
+			"properties": {
+				"sellers": {
+					"type": "number"
+				},
+				"totalNumberBids": {
+					"type": "number"
+				},
+				"totalValueBids": {
+					"type": "number"
+				},
+				"bidders": {
+					"type": "string"
+				}
+			}
+		},
+		"Stats": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/Stat"
+			}
+		},
+
+		"Error": {
+			"required": [
+				"code",
+				"message"
+			],
+			"properties": {
+				"code": {
+					"type": "integer",
+					"format": "int32"
+				},
+				"message": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}

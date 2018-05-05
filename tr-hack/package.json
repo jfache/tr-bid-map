@@ -1,0 +1,47 @@
+{
+    "name": "tr-hack",
+    "description": "",
+    "version": "1.0.0",
+    "author": "Thurairaj Letchumanan <thurairaj.letchumanan@traderev.com>",
+    "contributors": [],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/thurairaj/tr-hack.git"
+    },
+    "bugs": "http://github.com/thurairaj/tr-hack/issues",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org"
+    },
+    "dependencies": {
+        "express": "^4.0.0",
+        "body-parser": "^1.15.0",
+        "swaggerize-express": "^4.0.0",
+        "mysql": "^2.15",
+        "async": "^2.6.0",
+        "tunnel-ssh": "^4.1.4",
+        "moment": "^2.22.1",
+        "underscore": "^1.9.0",
+        "swagmock": "~0.0.2"
+    },
+    "devDependencies": {
+        "eslint": "^2",
+        "tape": "^4",
+        "istanbul": "~0.4.3",
+        "is-my-json-valid": "^2.13.1",
+        "js-yaml": "^3.2.6",
+        "supertest": "^1.2.0",
+        "ssh2": "0.6.0",
+        "swagger-parser": "^3.4.1",
+        "mysql-ssh": "^1.0.6"
+    },
+    "scripts": {
+        "test": "tape 'tests/**/*.js'",
+        "cover": "istanbul cover tape -- 'tests/**/*.js'",
+        "lint": "eslint .",
+        "regenerate": "yo swaggerize:test --framework express --apiPath './config/swagger.json'"
+    },
+    "generator-swaggerize": {
+        "version": "4.1.0"
+    },
+    "main": "./server"
+}
