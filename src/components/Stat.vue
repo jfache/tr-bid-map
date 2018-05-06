@@ -33,7 +33,6 @@ export default {
     margin: 25px 0;
 }
 .stat__label {
-    text-transform: uppercase;
     font-size: 20px;
     color: #fff;
 }

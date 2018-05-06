@@ -3,24 +3,32 @@ export default [
         name: 'North America',
         center: [-112.898047, 42.999263],
         zoom: 3.5,
+        pitch: 0, 
+        bearing: 0, 
         duration: 10000
     },
     {
         name: 'Ontario',
-        center: [-80.03510711831689, 43.56138875326664],
+        center: [-80.53510711831689, 43.56138875326664],
         zoom: 7.97,
-        duration: 8000
+        pitch: 60, 
+        bearing: -30, 
+        duration: 12000
     },
     {
-        name: 'Quebec',
-        center: [-74.81067468770692, 45.82056725039618],
-        zoom: 7.26,
-        duration: 5000
+        name: 'Ottawa & Quebec',
+        center: [-75.1067468770692, 45.02056725039618],
+        zoom: 7.75,
+        pitch: 90, 
+        bearing: 0, 
+        duration: 10000
     },
     {
         name: 'US East Coast',
         center: [-73.3638803369696, 41.64457871644743],
-        zoom: 6.86,
-        duration: 5000
+        zoom: 7.86,
+        pitch: 90, 
+        bearing: 40, 
+        duration: 10000
     }
 ];

@@ -30,6 +30,8 @@ import areas from './constants/areas';
 import { findWhere } from 'underscore';
 import turf from 'turf';
 
+
+
 const defaultOptions = {
     style: 'mapbox://styles/luukvanbaars/cjgsa6mk6000w2rnkmnn1em4t',
     center: areas[0].center,
@@ -339,7 +341,9 @@ export default {
             _map.flyTo({
                 center: nextArea.center,
                 zoom: nextArea.zoom,
-                speed: 0.5
+                pitch: nextArea.pitch, 
+   				bearing: nextArea.bearing, 
+                speed: 0.25
             });
 
             setTimeout(this.panMap, nextArea.duration);
@@ -398,5 +402,6 @@ body {
     position: absolute;
     top: 20px;
     left: 20px;
+    z-index: 10000;
 }
 </style>
