@@ -6,6 +6,7 @@
         <mapbox
             access-token="pk.eyJ1IjoibHV1a3ZhbmJhYXJzIiwiYSI6ImNqZ3Jia3pyMjAwa3Myd2xlczhzYWk3NWsifQ.VNQ_VAyPIF2BaZEo4lztFw"
             :map-options="mapOptions"
+            :nav-control="{show: false}"
             @map-load="mapLoaded">
         </mapbox>
         <div id="debug">
