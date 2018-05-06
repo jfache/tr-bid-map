@@ -1,7 +1,7 @@
 export default [
     {
         name: 'North America',
-        center: [-112.898047, 42.999263],
+        center: [-108.898047, 42.999263],
         zoom: 3.5,
         pitch: 0, 
         bearing: 0, 
