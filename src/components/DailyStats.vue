@@ -29,8 +29,8 @@ export default {
     z-index: 10000;
     position: fixed;
     bottom: 80px;
-    right: 0px;
-    width: 40vh;
+    right: 80px;
+    width: auto;
     overflow: hidden;
 }
 
