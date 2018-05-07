@@ -432,7 +432,7 @@ body {
     right: 80px;
     font-weight: bold;
     color: #fff;
-    font-size: 24px;
+    font-size: 36px;
 }
 
 .fade-enter-active,
