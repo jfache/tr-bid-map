@@ -385,6 +385,7 @@ body {
 
 #overlay {
     background-image: url('assets/gradient-overlay.png');
+    background-size: cover;
     position: absolute;
     height: 100%;
     width: 100%;
