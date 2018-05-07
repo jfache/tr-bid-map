@@ -3,9 +3,11 @@
         <div id="overlay"></div>
         <activity-feed :activities="activities" />
         <daily-stats :stats="stats" />
-        <div class="area-name">
-            {{areaName}}
-        </div>
+        <transition name="fade">
+            <div class="area-name" v-if="!isMoving">
+                {{areas[areaIndex].name}}
+            </div>
+        </transition>
         <mapbox
             access-token="pk.eyJ1IjoibHV1a3ZhbmJhYXJzIiwiYSI6ImNqZ3Jia3pyMjAwa3Myd2xlczhzYWk3NWsifQ.VNQ_VAyPIF2BaZEo4lztFw"
             :map-options="mapOptions"
@@ -69,15 +71,6 @@ export default {
             areas: areas,
             isMoving: false
         };
-    },
-    computed: {
-        areaName() {
-            if (this.isMoving) {
-                return '';
-            } else {
-                return areas[this.areaIndex].name;
-            }
-        }
     },
     created: function() {
         var vm = this;
@@ -440,5 +433,14 @@ body {
     font-weight: bold;
     color: #fff;
     font-size: 24px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
