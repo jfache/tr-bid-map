@@ -3,11 +3,16 @@
         <div id="overlay"></div>
         <activity-feed :activities="activities" />
         <daily-stats :stats="stats" />
+        <div class="area-name">
+            {{areaName}}
+        </div>
         <mapbox
             access-token="pk.eyJ1IjoibHV1a3ZhbmJhYXJzIiwiYSI6ImNqZ3Jia3pyMjAwa3Myd2xlczhzYWk3NWsifQ.VNQ_VAyPIF2BaZEo4lztFw"
             :map-options="mapOptions"
             :nav-control="{show: false}"
-            @map-load="mapLoaded">
+            @map-load="mapLoaded"
+            @map-movestart="mapMoveStart"
+            @map-moveend="mapMoveEnd">
         </mapbox>
         <div id="debug">
             <div @click="panMap">Pan Map</div>
@@ -20,6 +25,7 @@
 import Mapbox from 'mapbox-gl-vue';
 import ActivityFeed from './components/ActivityFeed';
 import DailyStats from './components/DailyStats';
+import trades from './data/trades.json';
 import dealers from './data/dealers.json';
 import dealerService from './services/dealer-service';
 import pushService from './services/push-service';
@@ -27,9 +33,8 @@ import eventBus from './services/event-bus';
 import eventConfig from './constants/event-config';
 import areas from './constants/areas';
 import { findWhere } from 'underscore';
+import { getRandomInt } from './services/utils-service';
 import turf from 'turf';
-
-
 
 const defaultOptions = {
     style: 'mapbox://styles/luukvanbaars/cjgsa6mk6000w2rnkmnn1em4t',
@@ -60,8 +65,19 @@ export default {
                 totalNumBids: 0
             },
             bids: [],
-            areaIndex: 0
+            areaIndex: 0,
+            areas: areas,
+            isMoving: false
         };
+    },
+    computed: {
+        areaName() {
+            if (this.isMoving) {
+                return '';
+            } else {
+                return areas[this.areaIndex].name;
+            }
+        }
     },
     created: function() {
         var vm = this;
@@ -69,20 +85,22 @@ export default {
 
         // Let the bids flow baby!
         eventBus.$on(eventConfig.newBid, function(bid) {
-            vm.updateActivityFeed(bid);
-            vm.animateDots(bid);
-        });
-    },
-    methods: {
-        animateDots({ maxBidAmount, topBidder, tradeId, tradeRegion }) {
-            let key = `${tradeId}-${maxBidAmount}-${topBidder.companyId}`;
+            let key = `${bid.tradeId}-${bid.maxBidAmount}-${
+                bid.topBidder.companyId
+            }`;
 
-            if (this.bids.includes(key)) {
+            if (vm.bids.includes(key)) {
                 return;
             }
 
-            this.bids.push(key);
+            vm.bids.push(key);
 
+            vm.updateActivityFeed(bid, key);
+            vm.animateDots(bid, key);
+        });
+    },
+    methods: {
+        animateDots({ maxBidAmount, topBidder, tradeId, tradeRegion }, key) {
             let seller = dealerService.getDealerFromTradeId(
                 tradeId,
                 tradeRegion
@@ -261,23 +279,10 @@ export default {
             }
             this.stats.totalNumBids++;
         },
-        updateActivityFeed({
-            maxBidAmount,
-            topBidder,
-            tradeId,
-            tradeRegion,
-            ...rest
-        }) {
-            let key = `${tradeId}-${maxBidAmount}-${topBidder.id}`;
-            let activity = findWhere(this.activities, {
-                key: key
-            });
-
-            // If we already have this activity in the feed, ignore it
-            if (activity) {
-                return;
-            }
-
+        updateActivityFeed(
+            { maxBidAmount, topBidder, tradeId, tradeRegion, ...rest },
+            key
+        ) {
             // If this is a valid bid, update daily stats
             this.updateDailyStats({ maxBidAmount, ...rest });
 
@@ -330,6 +335,13 @@ export default {
             _map = map;
             this.placeDealers(map);
             setTimeout(this.panMap, areas[this.areaIndex].duration);
+            setTimeout(this.bid, 1000);
+        },
+        mapMoveStart() {
+            this.isMoving = true;
+        },
+        mapMoveEnd() {
+            this.isMoving = false;
         },
         panMap() {
             this.areaIndex++;
@@ -341,8 +353,8 @@ export default {
             _map.flyTo({
                 center: nextArea.center,
                 zoom: nextArea.zoom,
-                pitch: nextArea.pitch, 
-   				bearing: nextArea.bearing, 
+                pitch: nextArea.pitch,
+                bearing: nextArea.bearing,
                 speed: 0.25
             });
 
@@ -351,6 +363,21 @@ export default {
         getMapInfo() {
             console.log(_map.getCenter());
             console.log(_map.getZoom());
+        },
+        bid() {
+            let randomTrade = trades[getRandomInt(0, trades.length - 1)];
+            let randomBidder = dealers[getRandomInt(0, dealers.length - 1)];
+            let message = {
+                maxBidAmount: getRandomInt(50, 15000),
+                tradeId: randomTrade.tradeID,
+                tradeRegion: randomTrade.region,
+                topBidder: {
+                    companyId: randomBidder.id,
+                    region: randomBidder.region
+                }
+            };
+            eventBus.$emit(eventConfig.newBid, message);
+            setTimeout(this.bid, getRandomInt(500, 3000));
         }
     }
 };
@@ -403,5 +430,16 @@ body {
     top: 20px;
     left: 20px;
     z-index: 10000;
+}
+
+.area-name {
+    position: absolute;
+    z-index: 100;
+    top: 80px;
+    right: 0;
+    width: 40vh;
+    font-weight: bold;
+    color: #fff;
+    font-size: 24px;
 }
 </style>
