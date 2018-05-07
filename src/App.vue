@@ -38,7 +38,7 @@ const defaultOptions = {
 };
 
 const defaultCircleRadius = {
-    stops: [[5, 1.75], [6, 3]]
+    stops: [[5, 1.75], [6, 2.5]]
 };
 
 // Populated on map load
