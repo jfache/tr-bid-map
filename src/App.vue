@@ -436,8 +436,7 @@ body {
     position: absolute;
     z-index: 100;
     top: 80px;
-    right: 0;
-    width: 40vh;
+    right: 80px;
     font-weight: bold;
     color: #fff;
     font-size: 24px;
