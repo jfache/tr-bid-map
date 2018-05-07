@@ -262,6 +262,7 @@ export default {
                 [`origin-point-${key}`, `point-${key}`, `route-${key}`].forEach(
                     layer => {
                         _map.removeLayer(layer);
+                        _map.removeSource(layer);
                     }
                 );
             }
